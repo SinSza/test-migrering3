@@ -6,4 +6,4 @@ clone_repo:
   script:
     - git clone https://gitlab.com/nanuchi/gitlab-cicd-crash-course.git
     - cd gitlab-cicd-crash-course
-    # Additional commands for the pipeline (e.g., testing, deployment, etc.)
+    # Additional commands for the pipeline (e.g., testing, deployment, etcs.)
