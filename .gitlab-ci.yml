@@ -24,9 +24,12 @@
 variables:
     IMAGE_NAME: brennuvargur/pipeline-test
     IMAGE_TAG: python-app-1.0
+stages:
+    - test
+    - build
 
-
-run_tests: #Navn på job
+run_tests:  #Navn på job
+    stage: test
     image: python:3.9-slim-buster #Specify the image we want
     before_script: #Commands that should run before script command, also have after_script
         - apt-get update && apt-get install make #installs make on container
@@ -34,6 +37,7 @@ run_tests: #Navn på job
     - make test #Run command make test (Python way of testing)
 
 build_image:
+    stage: build
     image: docker:28.0.1-cli
     services: #additional container that starts at the same time as the job container, job container can use that service during buildtime, most common use case is to run a database container
      - docker:28.0.1-dind #Two container must share cert directory 
