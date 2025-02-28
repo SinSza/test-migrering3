@@ -1,0 +1,42 @@
+    # Need three things to run the make test
+    # Need to have make command available, pip and python
+    # Install dependencies
+
+    # The job will be executed on runners
+    # Gitlab runners -> exectutor
+    # Executor determines the enviroment each job runs in
+    # Shell is the simples executor, commans executed on operatin system
+    # On the shell of the server, where GitLab runner is installed
+
+    # Another common execution enviroment on GitLab is dockercontainer
+    # Instead of executing the jobs directly on the operating system (ex. Linux machine)
+    # Execute the job on a docker container
+    # GitLab runner is installed on Linux machine ->
+    # GitLab runner creates docker containers to run the job
+    # GitLabs managed runners use Docker containers
+    # Containers run based on a certain Docker image
+    # Depending on the image you use, you have different tools available, inside the container
+    # If you have a node.js image you have npm and node.js available in the container
+    # By default GitLab managed runners use ruby image
+    # For our job to execute Python test, we need Python not ruby, need make test available
+    # Can specify the Docker image that the job should run in
+
+
+run_tests: #Navn på job
+    image: python:3.9-slim-buster #Specify the image we want
+    before_script: #Commands that should run before script command, also have after_script
+        - apt-get update && apt-get install make #installs make on container
+    script: #Specify the commands to exectute
+    - make test #Run command make test (Python way of testing)
+
+
+
+
+
+
+
+
+
+
+
+
