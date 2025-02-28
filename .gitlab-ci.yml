@@ -21,6 +21,10 @@
     # For our job to execute Python test, we need Python not ruby, need make test available
     # Can specify the Docker image that the job should run in
 
+variables:
+    IMAGE_NAME: brennuvargur/pipeline-test
+    IMAGE_TAG: python-app-1.0
+
 
 run_tests: #Navn på job
     image: python:3.9-slim-buster #Specify the image we want
@@ -29,7 +33,17 @@ run_tests: #Navn på job
     script: #Specify the commands to exectute
     - make test #Run command make test (Python way of testing)
 
-
+build_image:
+    image: docker:28.0.1-cli
+    services: #additional container that starts at the same time as the job container, job container can use that service during buildtime, most common use case is to run a database container
+     - docker:28.0.1-dind #Two container must share cert directory 
+    variables:
+        DOCKER_TLS_CERTDIR: "/certs"
+    before_script:
+     - docker login -u $DOCKER_USER -p $DOCKER_PASS
+    script:
+     - docker build -t $IMAGE_NAME:$IMAGE_TAG . #building image from dockerfile in repo
+     - docker push $IMAGE_NAME:$IMAGE_TAG
 
 
 
