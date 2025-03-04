@@ -26,13 +26,15 @@ jobs:
       - name: Install Git, Git LFS, and dependencies
         run: |
           apt-get update
-          apt-get install -y git
-          apt-get install -y curl
-          curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
-          apt-get install -y git-lfs
-          git lfs install
-          git lfs version  # Check if git-lfs is properly installed
-          apt-get install -y make
+          apt-get install -y sudo
+          sudo apt-get update
+          sudo apt-get install -y git
+          sudo apt-get install -y curl
+          curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+          sudo apt-get install -y git-lfs
+          sudo git lfs install
+          sudo git lfs version  # Check if git-lfs is properly installed
+          sudo apt-get install -y make
 
       - name: Checkout repository with Git LFS support
         uses: actions/checkout@v4.1.0
@@ -54,12 +56,12 @@ jobs:
     steps:
       - name: Install Git, Git LFS, and dependencies
         run: |
-          apt-get update
-          apt-get install -y git
-          curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
-          apt-get install -y git-lfs
-          git lfs install
-          git lfs version  # Check if git-lfs is properly installed
+          sudo apt-get update
+          sudo apt-get install -y git
+          curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+          sudo apt-get install -y git-lfs
+          sudo git lfs install
+          sudo git lfs version  # Check if git-lfs is properly installed
 
       - name: Checkout repository with Git LFS support
         uses: actions/checkout@v4.1.0
