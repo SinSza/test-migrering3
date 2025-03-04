@@ -23,7 +23,7 @@ jobs:
       IMAGE_NAME: brennuvargur/pipeline-test
       IMAGE_TAG: python-app-1.0
     steps:
-      - name: Install Git, Git LFS and dependencies
+      - name: Install Git, Git LFS, and dependencies
         run: |
           apt-get update
           apt-get install -y git
@@ -31,6 +31,7 @@ jobs:
           curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
           apt-get install -y git-lfs
           git lfs install
+          git lfs version  # Check if git-lfs is properly installed
           apt-get install -y make
 
       - name: Checkout repository with Git LFS support
@@ -40,7 +41,7 @@ jobs:
           lfs: true
 
       - name: Run tests
-        run: make test  # Ensure makefile exists with a 'test' target
+        run: make test  # Ensure the makefile exists with a 'test' target
 
   build_image:
     needs: run_tests
@@ -57,6 +58,15 @@ jobs:
       IMAGE_TAG: python-app-1.0
       DOCKER_TLS_CERTDIR: "/certs"
     steps:
+      - name: Install Git and Git LFS in Docker
+        run: |
+          apt-get update
+          apt-get install -y git
+          curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+          apt-get install -y git-lfs
+          git lfs install
+          git lfs version  # Check if git-lfs is properly installed
+
       - name: Checkout repository with Git LFS support
         uses: actions/checkout@v4.1.0
         with:
