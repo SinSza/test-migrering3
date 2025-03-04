@@ -1,47 +1,75 @@
 name: test-prosjekt1/pipeline-test
+
 on:
   push:
   workflow_dispatch:
+
 concurrency:
   group: "${{ github.ref }}"
   cancel-in-progress: true
+
 env:
-  DOCKER_USER: "${{ secrets.DOCKER_USER }}"
+  DOCKER_USER: brennuvargur
   DOCKER_PASS: DetteErMittPassord
+
 jobs:
   run_tests:
     runs-on: ubuntu-latest
     container:
       image: python:3.9-slim-buster
+      options: --user root  # Run as root user
     timeout-minutes: 60
     env:
       IMAGE_NAME: brennuvargur/pipeline-test
       IMAGE_TAG: python-app-1.0
     steps:
-    - uses: actions/checkout@v4.1.0
-      with:
-        fetch-depth: 20
-        lfs: true
-    - run: apt-get update && apt-get install make
-    - run: make test
+      - name: Install Git and Git LFS
+        run: |
+          apt-get update
+          apt-get install -y git
+          apt-get install -y curl
+          curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+          apt-get install -y git-lfs
+          git lfs install
+
+      - name: Checkout
+        uses: actions/checkout@v4.1.0
+        with:
+          fetch-depth: 20
+          lfs: true
+
+      - name: Install dependencies
+        run: apt-get update && apt-get install make
+
+      - name: Run tests
+        run: make test
+
   build_image:
     needs: run_tests
     runs-on: ubuntu-latest
     container:
       image: docker:28.0.1-cli
+      options: --user root  # Run as root user
     timeout-minutes: 60
     services:
-      docker:28.0.1-dind:
+      docker:
         image: docker:28.0.1-dind
     env:
       IMAGE_NAME: brennuvargur/pipeline-test
       IMAGE_TAG: python-app-1.0
       DOCKER_TLS_CERTDIR: "/certs"
     steps:
-    - uses: actions/checkout@v4.1.0
-      with:
-        fetch-depth: 20
-        lfs: true
-    - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-    - run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
-    - run: docker push $IMAGE_NAME:$IMAGE_TAG
+      - name: Checkout
+        uses: actions/checkout@v4.1.0
+        with:
+          fetch-depth: 20
+          lfs: true
+
+      - name: Docker login
+        run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+
+      - name: Build Docker image
+        run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME:$IMAGE_TAG
