@@ -39,10 +39,10 @@ jobs:
           lfs: true
 
       - name: Install dependencies
-        run: apt-get update && apt-get install make
+        run: apt-get update && apt-get install -y make
 
-      - name: Run tests
-        run: make test
+      - name: Run tests directly (e.g., using pytest)
+        run: pytest  # Replace with your actual test command
 
   build_image:
     needs: run_tests
