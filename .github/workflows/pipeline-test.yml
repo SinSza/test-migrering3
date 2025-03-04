@@ -1,0 +1,47 @@
+name: test-prosjekt1/pipeline-test
+on:
+  push:
+  workflow_dispatch:
+concurrency:
+  group: "${{ github.ref }}"
+  cancel-in-progress: true
+env:
+  DOCKER_USER: "${{ secrets.DOCKER_USER }}"
+  DOCKER_PASS: DetteErMittPassord
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.9-slim-buster
+    timeout-minutes: 60
+    env:
+      IMAGE_NAME: brennuvargur/pipeline-test
+      IMAGE_TAG: python-app-1.0
+    steps:
+    - uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: apt-get update && apt-get install make
+    - run: make test
+  build_image:
+    needs: run_tests
+    runs-on: ubuntu-latest
+    container:
+      image: docker:28.0.1-cli
+    timeout-minutes: 60
+    services:
+      docker:28.0.1-dind:
+        image: docker:28.0.1-dind
+    env:
+      IMAGE_NAME: brennuvargur/pipeline-test
+      IMAGE_TAG: python-app-1.0
+      DOCKER_TLS_CERTDIR: "/certs"
+    steps:
+    - uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+    - run: docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    - run: docker push $IMAGE_NAME:$IMAGE_TAG
