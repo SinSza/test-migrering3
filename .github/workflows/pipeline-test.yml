@@ -45,20 +45,14 @@ jobs:
 
   build_image:
     needs: run_tests
-    runs-on: ubuntu-latest
-    container:
-      image: docker:28.0.1-cli
-      options: --user root  # Run as root user
+    runs-on: ubuntu-latest  # Using Ubuntu instead of the Docker CLI image
     timeout-minutes: 60
-    services:
-      docker:
-        image: docker:28.0.1-dind
     env:
       IMAGE_NAME: brennuvargur/pipeline-test
       IMAGE_TAG: python-app-1.0
       DOCKER_TLS_CERTDIR: "/certs"
     steps:
-      - name: Install Git and Git LFS in Docker
+      - name: Install Git, Git LFS, and dependencies
         run: |
           apt-get update
           apt-get install -y git
